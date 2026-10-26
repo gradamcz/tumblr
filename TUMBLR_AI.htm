@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PGSC Tumblr JSONP Working Test</title>
+
+<style>
+    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+    #pgsc-posts { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    .pgsc-post { padding: 20px 0; border-bottom: 1px solid #ccc; }
+    .pgsc-post img { max-width: 100%; height: auto; }
+    .pgsc-date { font-size: 0.8em; color: #666; margin-top: 10px; }
+</style>
+</head>
+
+<body>
+
+<h1>PGSC Tumblr JSONP Working Test</h1>
+<div id="pgsc-posts">Loading posts…</div>
+
+<script>
+// Tumblr JSONP callback
+function tumblr_api_read(data) {
+    const posts = data.posts;
+    const container = document.getElementById("pgsc-posts");
+
+    let html = "";
+
+    posts.forEach(post => {
+        html += `<div class="pgsc-post">`;
+
+        if (post["regular-title"]) {
+            html += `<h2>${post["regular-title"]}</h2>`;
+        }
+
+        switch (post.type) {
+            case "regular":
+                html += `<div>${post["regular-body"]}</div>`;
+                break;
+
+            case "photo":
+                html += `<img src="${post["photo-url-500"]}">`;
+                html += `<div>${post["photo-caption"]}</div>`;
+                break;
+
+            case "link":
+                html += `<a href="${post["link-url"]}" target="_blank">${post["link-text"]}</a>`;
+                html += `<div>${post["link-description"]}</div>`;
+                break;
+
+            case "quote":
+                html += `<blockquote>${post["quote-text"]}</blockquote>`;
+                html += `<cite>${post["quote-source"]}</cite>`;
+                break;
+
+            case "video":
+                html += `<div>${post["video-player"]}</div>`;
+                html += `<div>${post["video-caption"]}</div>`;
+                break;
+
+            case "audio":
+                html += `<div>${post["audio-player"]}</div>`;
+                html += `<div>${post["audio-caption"]}</div>`;
+                break;
+        }
+
+        if (post.date) {
+            html += `<div class="pgsc-date">${post.date}</div>`;
+        }
+
+        html += `</div>`;
+    });
+
+    container.innerHTML = html;
+}
+</script>
+
+<!-- Load Tumblr JSONP -->
+<script src="https://puntagordasailingclub.tumblr.com/api/read/json?num=20"></script>
+
+</body>
+</html>
